@@ -21,6 +21,7 @@ ENV/
 
 # Data (keep structure, ignore content)
 data/*.json
+data/*.lock
 !data/.gitkeep
 
 # OS
