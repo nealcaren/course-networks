@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Student Network - Course Networks{% endblock %}
+
+{% block head %}
+<script src="https://d3js.org/d3.v7.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="network-container">
+    <div class="network-header">
+        <h1>Who's Connected?</h1>
+        <p>Each bubble is a student. Lines connect people who share classes (besides SOCI 101). Drag nodes around!</p>
+        <div class="status-indicator">
+            <span class="status-dot"></span>
+            <span id="status-text">Connecting...</span>
+        </div>
+    </div>
+
+    <div class="network-legend">
+        <div class="legend-item">
+            <span class="legend-node"></span>
+            <span>Bigger bubble = more courses</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-edge"></span>
+            <span>Thicker line = more shared courses</span>
+        </div>
+    </div>
+
+    <div id="network-graph" class="graph-container">
+        <div class="loading">Building the network...</div>
+    </div>
+
+    <div class="network-controls">
+        <div class="search-box">
+            <input type="text" id="node-search" placeholder="Find yourself (e.g., A1234)" maxlength="5">
+            <button id="search-btn" class="btn-primary">Find</button>
+            <button id="clear-search" class="btn-secondary">Clear</button>
+        </div>
+        <button id="reset-zoom" class="btn-secondary">Reset View</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/student-network.js') }}"></script>
+{% endblock %}

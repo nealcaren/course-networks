@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Course Networks{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="{{ url_for('main.index') }}">Course Networks</a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('main.index') }}" {% if request.endpoint == 'main.index' %}class="active"{% endif %}>Register</a></li>
+            <li><a href="{{ url_for('views.student_network') }}" {% if request.endpoint == 'views.student_network' %}class="active"{% endif %}>Student Network</a></li>
+            <li><a href="{{ url_for('views.course_network') }}" {% if request.endpoint == 'views.course_network' %}class="active"{% endif %}>Course Network</a></li>
+            <li><a href="{{ url_for('views.stats') }}" {% if request.endpoint == 'views.stats' %}class="active"{% endif %}>Statistics</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>A class activity exploring the <strong>Strength of Weak Ties</strong></p>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

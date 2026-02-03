@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Course Networks{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Join the Network!</h1>
+    <p class="form-description">
+        Hey! We're building a visualization of how our class is connected through the courses we take.
+        Add your info below and then check out the network graphs to see who you're connected to!
+    </p>
+
+    <form id="registration-form">
+        <div class="form-group">
+            <label for="student-id">Pick a Code Name</label>
+            <input type="text" id="student-id" name="student_id"
+                   placeholder="e.g., A1234" maxlength="5" required>
+            <span class="help-text">Make up a unique code (1 letter + 4 numbers). This keeps you anonymous in the network!</span>
+            <span class="error-text" id="student-id-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label>What courses are you taking?</label>
+            <div id="courses-container">
+                <div class="course-entry">
+                    <input type="text" class="course-input"
+                           placeholder="e.g., SOCI 101" required>
+                    <button type="button" class="btn-remove" disabled>Remove</button>
+                </div>
+            </div>
+            <span class="help-text">Include all your courses! Format: DEPT + number (like PSYC 210). Section numbers don't matter.</span>
+            <button type="button" id="add-course" class="btn-secondary">+ Add Another Course</button>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary" id="submit-btn">Add Me to the Network!</button>
+        </div>
+
+        <div id="form-message" class="form-message"></div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/form.js') }}"></script>
+{% endblock %}

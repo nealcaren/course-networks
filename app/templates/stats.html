@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}Statistics - Course Networks{% endblock %}
+
+{% block content %}
+<div class="stats-container">
+    <div class="stats-header">
+        <h1>Network Insights</h1>
+        <div class="status-indicator">
+            <span class="status-dot"></span>
+            <span id="status-text">Connecting...</span>
+        </div>
+    </div>
+
+    <div class="overview-cards" id="overview-cards">
+        <div class="card">
+            <div class="card-value" id="total-students">-</div>
+            <div class="card-label">Students</div>
+        </div>
+        <div class="card">
+            <div class="card-value" id="total-courses">-</div>
+            <div class="card-label">Courses</div>
+        </div>
+        <div class="card">
+            <div class="card-value" id="avg-courses">-</div>
+            <div class="card-label">Avg Courses Each</div>
+        </div>
+        <div class="card">
+            <div class="card-value" id="network-density">-</div>
+            <div class="card-label">Network Density</div>
+        </div>
+    </div>
+
+    <div class="concept-box">
+        <h2>The Strength of Weak Ties</h2>
+        <p>
+            Here's a counterintuitive idea from sociology: your <strong>weak ties</strong> (acquaintances,
+            not close friends) are often more valuable for things like finding a job or hearing new ideas.
+            Why? Because your close friends tend to know the same people and information you do.
+            But acquaintances move in different circles and can connect you to entirely new networks.
+        </p>
+        <p>
+            Sociologist <strong>Mark Granovetter</strong> discovered this in his famous 1973 study.
+            In our class network, the students with high <strong>betweenness centrality</strong> are the
+            "bridge" people who connect different groups. They're in a unique position to spread
+            information (or gossip!) across the whole network.
+        </p>
+    </div>
+
+    <div class="centrality-section highlight-section">
+        <h2>Who Are the Bridges?</h2>
+        <p class="section-description">
+            <strong>Betweenness centrality</strong> measures who sits "between" different groups.
+            High scores = you're a bridge connecting people who wouldn't otherwise be connected!
+        </p>
+        <div class="centrality-tables two-column">
+            <div class="centrality-table">
+                <h3>Bridge Students</h3>
+                <p class="metric-description">These students connect different social circles</p>
+                <table id="student-betweenness-table">
+                    <thead><tr><th>Student</th><th>Score</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="centrality-table">
+                <h3>Bridge Courses</h3>
+                <p class="metric-description">These courses bring together different groups of students</p>
+                <table id="course-betweenness-table">
+                    <thead><tr><th>Course</th><th>Score</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="centrality-section">
+        <h2>Other Ways to Measure Importance</h2>
+        <p class="section-description">
+            Network scientists have different ways to measure who's "important" in a network.
+            Each tells you something different!
+        </p>
+
+        <div class="metric-explainer">
+            <div class="metric-card">
+                <h4>Degrees of Separation</h4>
+                <p>Like "six degrees of Kevin Bacon"! This measures your average distance to everyone else
+                in the network. Lower = you can reach people in fewer hops.</p>
+            </div>
+            <div class="metric-card">
+                <h4>Closeness Centrality</h4>
+                <p>The inverse of your average distance. Higher closeness = you're more central and can
+                spread information efficiently. Think of it as how "in the middle" you are.</p>
+            </div>
+            <div class="metric-card">
+                <h4>Eigenvector Centrality</h4>
+                <p>It's not just who you know, but who <em>they</em> know. Being connected to well-connected
+                people boosts your score. Google's PageRank is based on this idea!</p>
+            </div>
+        </div>
+
+        <details class="more-stats">
+            <summary>Show detailed rankings for all metrics</summary>
+
+            <h3 class="subsection-title">Student Rankings</h3>
+            <div class="centrality-tables">
+                <div class="centrality-table">
+                    <h4>Degrees of Separation</h4>
+                    <table id="student-separation-table">
+                        <thead><tr><th>Student</th><th>Avg Hops</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="centrality-table">
+                    <h4>Closeness</h4>
+                    <table id="student-closeness-table">
+                        <thead><tr><th>Student</th><th>Score</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="centrality-table">
+                    <h4>Eigenvector</h4>
+                    <table id="student-eigenvector-table">
+                        <thead><tr><th>Student</th><th>Score</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">Course Rankings</h3>
+            <div class="centrality-tables">
+                <div class="centrality-table">
+                    <h4>Degrees of Separation</h4>
+                    <table id="course-separation-table">
+                        <thead><tr><th>Course</th><th>Avg Hops</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="centrality-table">
+                    <h4>Closeness</h4>
+                    <table id="course-closeness-table">
+                        <thead><tr><th>Course</th><th>Score</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="centrality-table">
+                    <h4>Eigenvector</h4>
+                    <table id="course-eigenvector-table">
+                        <thead><tr><th>Course</th><th>Score</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </details>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let lastUpdated = null;
+    const POLL_INTERVAL = 5000;
+
+    function updateStatusIndicator(isLive) {
+        const dot = document.querySelector('.status-dot');
+        const text = document.getElementById('status-text');
+        if (isLive) {
+            dot.classList.add('live');
+            text.textContent = 'Live';
+        } else {
+            dot.classList.remove('live');
+            text.textContent = 'Updating...';
+        }
+    }
+
+    function populateTable(tableId, data, metric, ascending = false) {
+        const tbody = document.querySelector(`#${tableId} tbody`);
+        tbody.innerHTML = '';
+
+        const sorted = Object.entries(data)
+            .map(([id, metrics]) => ({ id, score: metrics[metric] }))
+            .sort((a, b) => ascending ? a.score - b.score : b.score - a.score)
+            .slice(0, 10);
+
+        if (sorted.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="2" class="no-data">No data yet</td></tr>';
+            return;
+        }
+
+        sorted.forEach((item, index) => {
+            const row = document.createElement('tr');
+            if (index === 0) row.classList.add('top-rank');
+            const decimals = metric === 'avg_separation' ? 2 : 3;
+            row.innerHTML = `<td>${item.id}</td><td>${item.score.toFixed(decimals)}</td>`;
+            tbody.appendChild(row);
+        });
+    }
+
+    function updateStats(data) {
+        // Overview cards
+        document.getElementById('total-students').textContent = data.overview.total_students;
+        document.getElementById('total-courses').textContent = data.overview.total_courses;
+        document.getElementById('avg-courses').textContent = data.overview.avg_courses_per_student;
+        document.getElementById('network-density').textContent = data.overview.network_density;
+
+        // Student centrality tables
+        populateTable('student-betweenness-table', data.student_centralities, 'betweenness');
+        populateTable('student-separation-table', data.student_centralities, 'avg_separation', true); // ascending - lower is better
+        populateTable('student-closeness-table', data.student_centralities, 'closeness');
+        populateTable('student-eigenvector-table', data.student_centralities, 'eigenvector');
+
+        // Course centrality tables
+        populateTable('course-betweenness-table', data.course_centralities, 'betweenness');
+        populateTable('course-separation-table', data.course_centralities, 'avg_separation', true); // ascending - lower is better
+        populateTable('course-closeness-table', data.course_centralities, 'closeness');
+        populateTable('course-eigenvector-table', data.course_centralities, 'eigenvector');
+    }
+
+    async function fetchStats() {
+        try {
+            const response = await fetch('/api/stats');
+            const data = await response.json();
+            updateStats(data);
+            updateStatusIndicator(true);
+        } catch (error) {
+            console.error('Error fetching stats:', error);
+            updateStatusIndicator(false);
+        }
+    }
+
+    async function checkForUpdates() {
+        try {
+            const response = await fetch('/api/status');
+            const status = await response.json();
+
+            if (lastUpdated !== status.last_updated) {
+                lastUpdated = status.last_updated;
+                await fetchStats();
+            }
+        } catch (error) {
+            console.error('Error checking status:', error);
+        }
+    }
+
+    // Initial load
+    fetchStats();
+
+    // Poll for updates
+    setInterval(checkForUpdates, POLL_INTERVAL);
+</script>
+{% endblock %}

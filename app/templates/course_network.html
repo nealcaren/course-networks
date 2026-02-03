@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Course Network - Course Networks{% endblock %}
+
+{% block head %}
+<script src="https://d3js.org/d3.v7.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="network-container">
+    <div class="network-header">
+        <h1>How Courses Connect</h1>
+        <p>Each bubble is a course. Lines connect courses that share students (besides SOCI 101). Drag nodes around!</p>
+        <div class="status-indicator">
+            <span class="status-dot"></span>
+            <span id="status-text">Connecting...</span>
+        </div>
+    </div>
+
+    <div class="network-legend">
+        <div class="legend-item">
+            <span class="legend-node course-legend"></span>
+            <span>Bigger bubble = more students enrolled</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-edge"></span>
+            <span>Thicker line = more students in common</span>
+        </div>
+    </div>
+
+    <div id="network-graph" class="graph-container">
+        <div class="loading">Building the network...</div>
+    </div>
+
+    <div class="network-controls">
+        <div class="search-box">
+            <input type="text" id="node-search" placeholder="Find a course (e.g., PSYC 210)">
+            <button id="search-btn" class="btn-primary">Find</button>
+            <button id="clear-search" class="btn-secondary">Clear</button>
+        </div>
+        <button id="reset-zoom" class="btn-secondary">Reset View</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/course-network.js') }}"></script>
+{% endblock %}
